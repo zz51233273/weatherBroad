@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -282,11 +283,42 @@ public class MainActivity extends Activity implements View.OnClickListener {
         pmDataTv.setText(todayWeather.getPm25());
         pmQualityTv.setText(todayWeather.getQuality());
         weekTv.setText(todayWeather.getDate());
-        temperatureTv.setText(todayWeather.getHigh()+"~"+todayWeather.getLow());
+        temperatureTv.setText(todayWeather.getLow()+" ~ "+todayWeather.getHigh());
         climateTv.setText(todayWeather.getType());
         windTv.setText("风力:"+todayWeather.getFengli());
+        chooseWeatherImg(todayWeather);
         Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
 
+    }
+    void chooseWeatherImg(TodayWeather todayWeather){
+        String updatetime=todayWeather.getUpdatetime();
+        updatetime=updatetime.substring(0,updatetime.indexOf(":"));
+        int nowTime=Integer.parseInt(updatetime);
+        if(nowTime>=6&&nowTime<19){
+            switch(todayWeather.getType()){
+                case "多云转晴":
+                    weatherImg.setImageResource(R.drawable.cloudy_with_rain);
+                    break;
+                case "晴":
+                    weatherImg.setImageResource(R.drawable.sun);
+                    break;
+                case "多云":
+                    weatherImg.setImageResource(R.drawable.cloudy);
+                default:
+            }
+        }else{
+            switch(todayWeather.getType()){
+                case "多云转晴":
+                    weatherImg.setImageResource(R.drawable.cloudy_with_rain_night);
+                    break;
+                case "晴":
+                    weatherImg.setImageResource(R.drawable.sun_night);
+                    break;
+                case "多云":
+                    weatherImg.setImageResource(R.drawable.cloudy_night);
+                default:
+            }
+        }
     }
     void updateWeatherData(){
         SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
