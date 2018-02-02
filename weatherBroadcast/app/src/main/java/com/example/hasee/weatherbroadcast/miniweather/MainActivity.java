@@ -49,7 +49,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     public BDLocationListener BaiDuListener = new MylocationListener();
     public LocationClient mLocationClient = null;
-    private boolean isFirstLocate = true;
     private LocationClientOption option = new LocationClientOption();
 
     private ImageView mUpdateBtn;
@@ -367,11 +366,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
         option.setIsNeedAddress(true);//可选，设置是否需要地址信息，默认不需要
         mLocationClient.setLocOption(option);
     }
+
     private void  requestLocation(){
         initLocation();
         Log.d("map requestLocation:","Run requestLocation ...");
         mLocationClient.start();
     }
+
     @Override
     public  void  onRequestPermissionsResult(int requestCode, String[] permissions,int[] grantResults){
         switch (requestCode){
@@ -393,6 +394,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             default:
         }
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -407,6 +409,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         super.onDestroy();
         mLocationClient.stop();
     }
+
     private void JudgePermission(){
         List<String> permissionList = new ArrayList<>();// Permission array list , request permissions in one array.
         if(ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=  PackageManager.PERMISSION_GRANTED){
