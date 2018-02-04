@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Location;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -12,13 +12,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
@@ -40,6 +37,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.hasee.weatherbroadcast.bls.MyLocation;
+import com.example.hasee.weatherbroadcast.database.DBHelper;
 import com.example.hasee.weatherbroadcast.database.DBManager;
 import com.example.hasee.weatherbroadcast.util.NetUtil;
 
@@ -47,11 +46,9 @@ import com.example.hasee.weatherbroadcast.util.NetUtil;
 public class MainActivity extends Activity implements View.OnClickListener {
 
     private static final int UPDATE_TODAY_WEATHER = 1;
-
-    public BDLocationListener BaiDuListener = new MylocationListener();
-    public LocationClient mLocationClient = null;
+    private BDLocationListener BaiDuListener = new MyLocation(this);
+    private LocationClient mLocationClient = null;
     private LocationClientOption option = new LocationClientOption();
-
     private ImageView mUpdateBtn;
     private ImageView lbs_btn;
     private ImageView mCitySelect;
@@ -62,7 +59,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private String code="";
     private Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
-            switch (msg.what) {
+            switch (msg.what){
                 case UPDATE_TODAY_WEATHER:
                     updateTodayWeather((TodayWeather) msg.obj);
                     break;
@@ -77,10 +74,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.weather_info);
-        mLocationClient = new LocationClient(getApplicationContext());//声明LocationClient类
-        mLocationClient.registerLocationListener(BaiDuListener);    //注册监听函数
+        setContentView(R.layout.weather_info_port);
         new DBManager(getApplicationContext()).writeData();
+        init();
+    }
+    void init(){
         //判断网络状态
         if (NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
             Log.d("myWeather", "网络OK");
@@ -94,6 +92,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     void initView(){        //初始化对象
+        mLocationClient = new LocationClient(getApplicationContext());//声明LocationClient类
+        mLocationClient.registerLocationListener(BaiDuListener);    //注册监听函数
         mUpdateBtn = (ImageView) findViewById(R.id.title_update_btn);
         mUpdateBtn.setOnClickListener(this);
         lbs_btn=(ImageView)findViewById(R.id.title_location);
@@ -112,17 +112,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
         climateTv = (TextView) findViewById(R.id.climate);
         windTv = (TextView) findViewById(R.id.wind);
         weatherImg = (ImageView) findViewById(R.id.weather_img);
-
-        city_name_Tv.setText("N/A");
-        cityTv.setText("N/A");
-        timeTv.setText("N/A");
-        humidityTv.setText("N/A");
-        pmDataTv.setText("N/A");
-        pmQualityTv.setText("N/A");
-        weekTv.setText("N/A");
-        temperatureTv.setText("N/A");
-        climateTv.setText("N/A");
-        windTv.setText("N/A");
+        pmImg=(ImageView)findViewById(R.id.pm2_5_img);
+        city_name_Tv.setText("");
+        cityTv.setText("");
+        timeTv.setText("");
+        humidityTv.setText("");
+        pmDataTv.setText("");
+        pmQualityTv.setText("");
+        weekTv.setText("");
+        temperatureTv.setText("");
+        climateTv.setText("");
+        windTv.setText("");
+        weatherImg.setImageResource(R.drawable.na);
+        updateWeatherData();
     }
 
     @Override
@@ -144,7 +146,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private void queryWeatherCode(String cityCode) {
         final String address = "http://wthrcdn.etouch.cn/WeatherApi?citykey=" + cityCode;
-
         Log.d("myWeather", address);
         new Thread(new Runnable() {
             @Override
@@ -275,7 +276,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         return todayWeather;
     }
 
-    void updateTodayWeather(TodayWeather todayWeather){         //更新当前天气信息
+    void updateTodayWeather(TodayWeather todayWeather){         //更新当前天气信息,在Handler中被调用
         city_name_Tv.setText(todayWeather.getCity()+"天气");
         cityTv.setText(todayWeather.getCity());
         timeTv.setText(todayWeather.getUpdatetime()+ "发布");
@@ -287,11 +288,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
         climateTv.setText(todayWeather.getType());
         windTv.setText("风力:"+todayWeather.getFengli());
         chooseWeatherImg(todayWeather);
-        Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
 
     }
     void chooseWeatherImg(TodayWeather todayWeather){
         String updatetime=todayWeather.getUpdatetime();
+        int pm=0;
+        if(null!=todayWeather.getPm25())
+            pm=Integer.parseInt(todayWeather.getPm25());
         updatetime=updatetime.substring(0,updatetime.indexOf(":"));
         int nowTime=Integer.parseInt(updatetime);
         if(nowTime>=6&&nowTime<19){
@@ -319,72 +323,40 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 default:
             }
         }
+        if(pm<=50){
+            pmImg.setImageResource(R.drawable.biz_plugin_weather_0_50);
+        }else if(pm<=100){
+            pmImg.setImageResource(R.drawable.biz_plugin_weather_51_100);
+        }else if(pm<=150){
+            pmImg.setImageResource(R.drawable.biz_plugin_weather_101_150);
+        }else if(pm<=200){
+            pmImg.setImageResource(R.drawable.biz_plugin_weather_151_200);
+        }else if(pm<=300){
+            pmImg.setImageResource(R.drawable.biz_plugin_weather_201_300);
+        }else{
+            pmImg.setImageResource(R.drawable.biz_plugin_weather_greater_300);
+        }
     }
     void updateWeatherData(){
         SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
-        if(SelectCity.spinner2!=null){
+        if(null!=SelectCity.spinner2){
             int pos=SelectCity.spinner2.getSelectedItemPosition();
             code=SelectCity.codes.get(pos);
-        }else{
+        }else if(!"".equals(MyLocation.cityCode)){
+            code=MyLocation.cityCode;
+        }
+        else{
             code="101010100";
         }
-        String cityCode = sharedPreferences.getString("main_city_code", code);
-        Log.d("myWeather", cityCode);
-
-
         if (NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
             Log.d("myWeather", "网络OK");
-            queryWeatherCode(cityCode);
+            queryWeatherCode(code);
         } else {
             Log.d("myWeather", "网络挂了");
             Toast.makeText(MainActivity.this, "网络挂了！", Toast.LENGTH_LONG).show();
         }
     }
 
-    public class MylocationListener implements BDLocationListener{
-        @Override
-        public  void onReceiveLocation(BDLocation location){
-            final StringBuilder currentPosition = new StringBuilder();
-            Log.d("test",location.getLocType()+"");
-            if(location.getLocType() == BDLocation.TypeGpsLocation){   // GPS定位结果
-                currentPosition.append("\nGPS定位成功");
-                currentPosition.append("\n");
-            }else if (location.getLocType() == BDLocation.TypeNetWorkLocation){  // Net定位结果
-                Log.d("map test","net");
-                currentPosition.append("[地址]");
-                currentPosition.append(location.getAddrStr());    //获取地址信息
-                currentPosition.append("\n[运营商]");
-                currentPosition.append(location.getOperators());    //获取运营商信息
-                currentPosition.append("\n网络定位成功！");
-                currentPosition.append("\n");
-            }else if (location.getLocType() == BDLocation.TypeOffLineLocation) {                // 离线定位结果
-                Log.d("map test","Offline");
-                currentPosition.append("\ndescribe : ");
-                currentPosition.append("离线定位成功，离线定位结果也是有效的");
-            } else if (location.getLocType() == BDLocation.TypeServerError) {
-                currentPosition.append("\ndescribe : ");
-                currentPosition.append("服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因\n");
-            } else if (location.getLocType() == BDLocation.TypeNetWorkException) {
-                currentPosition.append("\ndescribe : ");
-                currentPosition.append("网络不同导致定位失败，请检查网络是否通畅\n");
-            } else if (location.getLocType() == BDLocation.TypeCriteriaException) {
-                currentPosition.append("\ndescribe : ");
-                currentPosition.append("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机\n");
-            }else {
-                currentPosition.append("定位失败。错误码：\n");
-                currentPosition.append(location.getLocType()).append("\n");
-            }
-            currentPosition.append("[经度]").append(location.getLongitude()+"").append("\n");
-            currentPosition.append("[维度]").append(location.getLatitude()+"").append("\n");
-            currentPosition.append("[国家]").append(location.getCountry()).append("\n");
-            currentPosition.append("[省份]").append(location.getProvince()).append("\n");
-            currentPosition.append("[城市]").append(location.getCity()).append("\n");
-            currentPosition.append("[区县]").append(location.getDistrict()).append("\n");
-            currentPosition.append("[街道]").append(location.getStreet());
-            Toast.makeText(MainActivity.this,location.getCity(),Toast.LENGTH_LONG).show();
-            Log.d("test",currentPosition+"");
-        }
-    }
     protected void onRefresh(){
         finish();
         Intent intent = new Intent(MainActivity.this, MainActivity.class);
@@ -442,7 +414,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mLocationClient.stop();
     }
 
-    private void JudgePermission(){
+    private void JudgePermission(){     //权限判断
         List<String> permissionList = new ArrayList<>();// Permission array list , request permissions in one array.
         if(ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=  PackageManager.PERMISSION_GRANTED){
             permissionList.add(android.Manifest.permission.ACCESS_FINE_LOCATION);
@@ -458,6 +430,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
             ActivityCompat.requestPermissions(MainActivity.this,permissions,1);//request all permissions
         }else {
             requestLocation();// Request Location information
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig){
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == this.getResources().getConfiguration().ORIENTATION_PORTRAIT) {             //切换为竖屏
+            setContentView(R.layout.weather_info_port);
+            init();
+        }else if (newConfig.orientation == this.getResources().getConfiguration().ORIENTATION_LANDSCAPE) {      //切换为横屏
+            setContentView(R.layout.weather_info_land);
+            init();
         }
     }
 }

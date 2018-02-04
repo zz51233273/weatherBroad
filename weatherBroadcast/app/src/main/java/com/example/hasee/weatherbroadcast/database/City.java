@@ -14,7 +14,31 @@ public class City {
     public static final String KEY_ALLFIRSTPY = "allfirstpy";// 列名
     public static final String KEY_FIRSTPY= "firstpy";// 列名
 
-    public int code;
-    public String province;
-    public String cityName;
+    private int code;
+    private String province;
+    private String cityName;
+
+    public void setCode(int code){
+        this.code=code;
+    }
+
+    public int getCode(){
+        return this.code;
+    }
+
+    public void setProvince(String province){
+        this.province=province;
+    }
+
+    public String getProvince(){
+        return this.province;
+    }
+
+    public void setCityName(String cityName){
+        this.cityName=cityName;
+    }
+
+    public String getCityName(){
+        return this.cityName;
+    }
 }

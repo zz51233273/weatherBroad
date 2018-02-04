@@ -23,6 +23,7 @@ import android.support.v7.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -44,6 +45,7 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
     private DBHelper dbHelper;    //用于创建帮助器对象（处理数据库相关操作）
     private SQLiteDatabase database;    //用于创建数据库对象
     private boolean flag;
+    private ImageView bg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,8 +81,8 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
 
         spinner1.setTag(1);     //设置标签，用于判断当前选择了哪一个下拉框
         spinner2.setTag(2);
+        chooseBackground();
     }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -102,6 +104,25 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
                 break;
             case 2:
                 testview.setText(adapter2.getItem(position));
+                break;
+        }
+
+    }
+    void chooseBackground(){        //随机选择背景图片
+        bg=(ImageView)findViewById(R.id.bg);
+        int m= new Random().nextInt(6);
+        switch (m){
+            case 0: bg.setImageResource(R.drawable.cbg0);
+                break;
+            case 1: bg.setImageResource(R.drawable.cbg1);
+                break;
+            case 2: bg.setImageResource(R.drawable.cbg2);
+                break;
+            case 3: bg.setImageResource(R.drawable.cbg3);
+                break;
+            case 4: bg.setImageResource(R.drawable.cbg4);
+                break;
+            case 5: bg.setImageResource(R.drawable.cbg5);
                 break;
         }
 
@@ -150,11 +171,11 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
         if (cursor.moveToFirst()) {
             do {
                 City c = new City();
-                c.province = cursor.getString(cursor.getColumnIndex(c.KEY_PROVINCE));
-                if(provinces.indexOf(c.province)==-1){      //保证省份不重复出现
-                    provinces.add(c.province);
+                c.setProvince(cursor.getString(cursor.getColumnIndex(c.KEY_PROVINCE)));
+                if(provinces.indexOf(c.getProvince())==-1){      //保证省份不重复出现
+                    provinces.add(c.getProvince());
                 }
-            } while (cursor.moveToNext());
+            }while (cursor.moveToNext());
         }
 
     }
@@ -162,10 +183,10 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
         if (cursor.moveToFirst()) {
             do {
                 City c = new City();
-                c.cityName = cursor.getString(cursor.getColumnIndex(c.KEY_CITY));
-                c.code= Integer.parseInt(cursor.getString(cursor.getColumnIndex(c.KEY_CODE)));
-                citys.add(c.cityName);
-                codes.add(String.valueOf(c.code));
+                c.setCityName(cursor.getString(cursor.getColumnIndex(c.KEY_CITY)));
+                c.setCode(cursor.getInt(cursor.getColumnIndex(c.KEY_CODE)));
+                citys.add(c.getCityName());
+                codes.add(String.valueOf(c.getCode()));
             } while (cursor.moveToNext());
         }
     }
