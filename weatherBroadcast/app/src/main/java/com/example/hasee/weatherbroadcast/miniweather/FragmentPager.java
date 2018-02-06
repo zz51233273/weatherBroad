@@ -1,15 +1,10 @@
 package com.example.hasee.weatherbroadcast.miniweather;
 
-import android.content.Context;
-import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
+import android.widget.TextView;
 
-import com.example.hasee.weatherbroadcast.R;
 import com.example.hasee.weatherbroadcast.adapter.MyFragmentPagerAdapter;
 
 /**
@@ -42,6 +37,7 @@ public class FragmentPager implements ViewPager.OnPageChangeListener{
 
     @Override
     public void onPageScrollStateChanged(int state) {
+
         //state的状态有三个，0表示什么都没做，1正在滑动，2滑动完毕
         if (state == 2) {
             switch (vpager.getCurrentItem()) {
