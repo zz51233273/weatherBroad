@@ -1,15 +1,18 @@
 package com.example.hasee.weatherbroadcast.miniweather;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,6 +24,7 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 
 import com.example.hasee.weatherbroadcast.R;
+import com.example.hasee.weatherbroadcast.adapter.MyFragmentPagerAdapter;
 import com.example.hasee.weatherbroadcast.bean.TodayWeather;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -38,12 +42,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.hasee.weatherbroadcast.bls.MyLocation;
-import com.example.hasee.weatherbroadcast.database.DBHelper;
+import android.content.ClipboardManager;
 import com.example.hasee.weatherbroadcast.database.DBManager;
 import com.example.hasee.weatherbroadcast.util.NetUtil;
 
 
-public class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int UPDATE_TODAY_WEATHER = 1;
     private BDLocationListener BaiDuListener = new MyLocation(this);
@@ -51,10 +55,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private LocationClientOption option = new LocationClientOption();
     private ImageView mUpdateBtn;
     private ImageView lbs_btn;
+    private ImageView share_btn;
     private ImageView mCitySelect;
     private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv,
             temperatureTv, climateTv, windTv, city_name_Tv;
     private ImageView weatherImg, pmImg;
+
+    private FragmentPager fragmentPager;
+    private ViewPager vpager;
 
     private String code="";
     private Handler mHandler = new Handler() {
@@ -75,6 +83,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_info_port);
+        vpager = (ViewPager) findViewById(R.id.vpager);
+        fragmentPager=new FragmentPager(getSupportFragmentManager(),vpager);
         new DBManager(getApplicationContext()).writeData();
         init();
     }
@@ -96,6 +106,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mLocationClient.registerLocationListener(BaiDuListener);    //注册监听函数
         mUpdateBtn = (ImageView) findViewById(R.id.title_update_btn);
         mUpdateBtn.setOnClickListener(this);
+        share_btn=(ImageView)findViewById(R.id.title_share);
+        share_btn.setOnClickListener(this);
         lbs_btn=(ImageView)findViewById(R.id.title_location);
         lbs_btn.setOnClickListener(this);
         mCitySelect = (ImageView) findViewById(R.id.title_city_manager);
@@ -141,6 +153,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
         else if(view.getId()==R.id.title_location){
             onRefresh();
+        }
+        else if(view.getId()==R.id.title_share){
+            copyWeatherMessage();
         }
     }
 
@@ -288,7 +303,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         climateTv.setText(todayWeather.getType());
         windTv.setText("风力:"+todayWeather.getFengli());
         chooseWeatherImg(todayWeather);
-        //Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
 
     }
     void chooseWeatherImg(TodayWeather todayWeather){
@@ -338,7 +352,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     }
     void updateWeatherData(){
-        SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
+        //SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
         if(null!=SelectCity.spinner2){
             int pos=SelectCity.spinner2.getSelectedItemPosition();
             code=SelectCity.codes.get(pos);
@@ -358,6 +372,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     protected void onRefresh(){
+        SelectCity.spinner2=null;
         finish();
         Intent intent = new Intent(MainActivity.this, MainActivity.class);
         startActivity(intent);
@@ -378,7 +393,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     @Override
-    public  void  onRequestPermissionsResult(int requestCode, String[] permissions,int[] grantResults){
+    public  void  onRequestPermissionsResult(int requestCode, String[] permissions,int[] grantResults){     //检查权限
         switch (requestCode){
             case 1:
                 if(grantResults.length >0 ){
@@ -414,7 +429,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mLocationClient.stop();
     }
 
-    private void JudgePermission(){     //权限判断
+    private void JudgePermission(){     //检查权限
         List<String> permissionList = new ArrayList<>();// Permission array list , request permissions in one array.
         if(ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=  PackageManager.PERMISSION_GRANTED){
             permissionList.add(android.Manifest.permission.ACCESS_FINE_LOCATION);
@@ -433,15 +448,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig){
-        super.onConfigurationChanged(newConfig);
-        if (newConfig.orientation == this.getResources().getConfiguration().ORIENTATION_PORTRAIT) {             //切换为竖屏
-            setContentView(R.layout.weather_info_port);
-            init();
-        }else if (newConfig.orientation == this.getResources().getConfiguration().ORIENTATION_LANDSCAPE) {      //切换为横屏
-            setContentView(R.layout.weather_info_land);
-            init();
+    private void copyWeatherMessage(){              //把当前天气信息复制到黏贴板上
+        if(null!=cityTv||!"".equals(cityTv)){
+            StringBuffer mes=new StringBuffer();
+            mes.append(cityTv.getText()+"\n").append(humidityTv.getText()+"\n").append("pm2.5指数："+pmDataTv.getText()+"\n").append("气温："+temperatureTv.getText()+"\n").append(climateTv.getText());
+            ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData mClipData = ClipData.newPlainText("Label", mes);
+            cm.setPrimaryClip(mClipData);
+            Toast.makeText(this,"已复制天气信息至粘贴板上",Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(this,"当前无天气信息",Toast.LENGTH_LONG).show();
         }
     }
 }

@@ -130,7 +130,6 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
     public void chooseProvine(){
         database = dbHelper.getWritableDatabase();  //创建数据库对象
         Cursor cursor=null;
-
         /*
             实现功能：选择城市时，下拉框默认值为主页面所选的省份和城市
          */
