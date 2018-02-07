@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -35,10 +36,8 @@ public class MyEventListener implements EventListener {
 
     private EventManager asr;
 
-    private boolean logTime = true;
-    private String citySpeaked;
+    private String citySpeaked="";
     private boolean enableOffline = false; // 测试离线命令词，需要改成true
-
 
     public MyEventListener(Context context,Activity activity){
         this.context=context;
@@ -58,6 +57,7 @@ public class MyEventListener implements EventListener {
      * 测试参数填在这里
      */
     private void start() {
+        citySpeaked="";
         Map<String, Object> params = new LinkedHashMap<String, Object>();
         String event = null;
         event = SpeechConstant.ASR_START; // 替换成测试的event
@@ -69,11 +69,9 @@ public class MyEventListener implements EventListener {
         String json = null; // 可以替换成自己的json
         json = new JSONObject(params).toString(); // 这里可以替换成你需要测试的json
         asr.send(event, json, null, 0, 0);
-        printLog("输入参数：" + json);
     }
 
     private void stop() {
-        printLog("停止识别：ASR_STOP");
         asr.send(SpeechConstant.ASR_STOP, null, null, 0, 0); //
     }
 
@@ -99,9 +97,7 @@ public class MyEventListener implements EventListener {
     //   EventListener  回调方法
     @Override
     public void onEvent(String name, String params, byte[] data, int offset, int length) {
-        String logTxt = "name: " + name;
         if (params != null && !params.isEmpty()) {
-            logTxt += " ;params :" + params;
             int pos=params.indexOf("best_result\":\"");
             if(pos!=-1){
                 citySpeaked="";
@@ -111,27 +107,16 @@ public class MyEventListener implements EventListener {
                 }
                 Log.d("test",citySpeaked);
             }
-
-
         }
         if (name.equals(SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL)) {
             if (params.contains("\"nlu_result\"")) {
                 if (length > 0 && data.length > 0) {
-                    logTxt += ", 语义解析结果：" + new String(data, offset, length);
+
                 }
             }
         } else if (data != null) {
-            logTxt += " ;data length=" + data.length;
-        }
-        printLog(logTxt);
-    }
 
-    private void printLog(String text) {
-        if (logTime) {
-            text += "  ;time=" + System.currentTimeMillis();
         }
-        text += "\n";
-        Log.i(getClass().getName(), text);
     }
 
     /**

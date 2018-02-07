@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,6 +27,7 @@ import com.example.hasee.weatherbroadcast.speechrecognizer.MyEventListener;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -111,6 +114,7 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
     public boolean onTouch(View v, MotionEvent event) {         //监听按下抬起事件
         if(v.getId() == R.id.speak){
             if(event.getAction() == MotionEvent.ACTION_DOWN) {  //按下
+                MediaPlayer.create(this,R.raw.bdspeech_recognition_start).start();
                 myEventListener.getStartFunction();
             }
             else if(event.getAction()==MotionEvent.ACTION_UP){  //抬起
@@ -120,9 +124,17 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
                 database=dbHelper.getWritableDatabase();
                 Cursor cursor=dbHelper.QueryProvinceByCity(database,city);
                 if(cursor.moveToFirst()){
+                    MediaPlayer.create(this, R.raw.bdspeech_recognition_success).start();
                     int pos=adapter1.getPosition(cursor.getString(cursor.getColumnIndex(City.KEY_PROVINCE)));   //得到一个省在下拉框中的位置
                     spinner1.setSelection(pos);
                     changeCityByProvince(city);
+                }else{
+                    if (" ".equals(city)||"".equals(city)){
+                        Toast.makeText(this,"说完后按的时间长一点",Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(this,"未搜索到指定城市",Toast.LENGTH_LONG).show();
+                    }
+                    MediaPlayer.create(this, R.raw.bdspeech_recognition_error).start();
                 }
             }
         }

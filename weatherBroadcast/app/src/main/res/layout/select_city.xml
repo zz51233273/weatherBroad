@@ -4,6 +4,19 @@
     android:layout_height="match_parent">
 
     <RelativeLayout
+        android:id="@+id/selectbg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/selectbg"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:alpha="0.38"/>
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/tool"
         android:layout_width="fill_parent"
         android:layout_height="45.0dip"
@@ -41,6 +54,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp">
+
         <Spinner
             android:id="@+id/select_provinces"
             android:layout_width="wrap_content"
