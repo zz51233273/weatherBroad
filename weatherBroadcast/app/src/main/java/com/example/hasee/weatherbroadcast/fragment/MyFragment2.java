@@ -1,6 +1,7 @@
 package com.example.hasee.weatherbroadcast.fragment;
 
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,6 +37,6 @@ public class MyFragment2 extends Fragment {
         t.setText(MyApplication.forecastWeather.getType());
         t = (TextView) view.findViewById(R.id.wind);
         t.setText("风力:"+MyApplication.forecastWeather.getFengli());
-        MyApplication.changeImg("6",MyApplication.forecastWeather.getType(),view);
+        MyApplication.changeImg("6",MyApplication.forecastWeather.getType(),view,1);
     }
 }

@@ -3,12 +3,10 @@ package com.example.hasee.weatherbroadcast.app;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.hasee.weatherbroadcast.R;
 import com.example.hasee.weatherbroadcast.bean.ForecastWeather;
 import com.example.hasee.weatherbroadcast.bean.TodayWeather;
-import com.example.hasee.weatherbroadcast.miniweather.MainActivity;
 
 /**
  * Created by hasee on 2018/1/27.
@@ -18,9 +16,8 @@ public class MyApplication {
     public static ForecastWeather forecastWeather=null; //明天
     public static ForecastWeather forecastWeather2=null; //后天
     public static TodayWeather todayWeather = null;
-    public static ImageView weatherImg, pmImg;
 
-    public static void changeImg(String updatetime,String type,View view){
+    public static void changeImg(String updatetime,String type,View view,int pos){
         ImageView i=(ImageView) view.findViewById(R.id.weather_img);
         int nowTime=Integer.parseInt(updatetime);
         if(nowTime>=6&&nowTime<19){
@@ -33,6 +30,13 @@ public class MyApplication {
                     break;
                 case "多云":
                     i.setImageResource(R.drawable.cloudy);
+                    break;
+                case "小雨":
+                    i.setImageResource(R.drawable.small_rain);
+                    break;
+                case  "阴":
+                    i.setImageResource(R.drawable.multycloudy);
+                    break;
                 default:
             }
         }else{
@@ -45,8 +49,20 @@ public class MyApplication {
                     break;
                 case "多云":
                     i.setImageResource(R.drawable.cloudy_night);
+                    break;
+                case "小雨":
+                    i.setImageResource(R.drawable.small_rain);
+                    break;
+                case  "阴":
+                    i.setImageResource(R.drawable.multycloudy);
+                    break;
                 default:
             }
+        }
+        if(pos==1){
+            forecastWeather.setWeatherImg(i);
+        }else if(pos==2){
+            forecastWeather2.setWeatherImg(i);
         }
     }
 }

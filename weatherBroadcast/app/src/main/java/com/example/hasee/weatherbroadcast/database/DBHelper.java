@@ -69,7 +69,14 @@ public class DBHelper extends SQLiteOpenHelper {
         String selectQuery =  "SELECT " +  City.KEY_CODE +
                 " FROM " + City.TABLE + " where "+ City.KEY_PROVINCE + " = "+"\""+province+"\" and "+ City.KEY_CITY + " = "+"\""+city+"\"";
         cursor = db.rawQuery(selectQuery, null);
+        return cursor;
+    }
 
+    public Cursor QueryProvinceByCity(SQLiteDatabase db,String city){       //通过城市查询省份
+        Cursor cursor=null;
+        String selectQuery = "SELECT " + City.KEY_PROVINCE +
+                " From " + City.TABLE + " where " + City.KEY_CITY + "=" + "\"" + city + "\"";
+        cursor=db.rawQuery(selectQuery,null);
         return cursor;
     }
 

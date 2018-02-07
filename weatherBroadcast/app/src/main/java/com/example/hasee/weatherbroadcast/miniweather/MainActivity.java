@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView city_name_Tv;
     private FragmentPager fragmentPager;
     private ViewPager vpager;
+    private ImageView weatherImg, pmImg;
     private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv,
             temperatureTv, climateTv, windTv;
 
@@ -123,12 +124,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         weekTv = (TextView) findViewById(R.id.week_today);
         pmDataTv = (TextView) findViewById(R.id.pm_data);
         pmQualityTv = (TextView) findViewById(R.id.pm2_5_quality);
-        MyApplication.pmImg = (ImageView) findViewById(R.id.pm2_5_img);
+        pmImg = (ImageView) findViewById(R.id.pm2_5_img);
         temperatureTv = (TextView) findViewById(R.id.temperature);
         climateTv = (TextView) findViewById(R.id.climate);
         windTv = (TextView) findViewById(R.id.wind);
-        MyApplication.weatherImg = (ImageView) findViewById(R.id.weather_img);
-        MyApplication.pmImg=(ImageView)findViewById(R.id.pm2_5_img);
+        weatherImg = (ImageView) findViewById(R.id.weather_img);
+        pmImg=(ImageView)findViewById(R.id.pm2_5_img);
         city_name_Tv.setText("");
         cityTv.setText("");
         timeTv.setText("");
@@ -139,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         temperatureTv.setText("");
         climateTv.setText("");
         windTv.setText("");
-        MyApplication.weatherImg.setImageResource(R.drawable.na);
+        weatherImg.setImageResource(R.drawable.na);
         updateWeatherData();
     }
 
@@ -219,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             xmlPullParser.setInput(new StringReader(xmldata));
             int eventType = xmlPullParser.getEventType();
             boolean isForecast=false;
-            int weatherStep=1;
+            int weatherStep=1;      //初始值代表当前天气信息
             Log.d("myWeather", "parseXML");
             while (eventType != XmlPullParser.END_DOCUMENT) {       //读取xml相应内容
                 switch (eventType) {
@@ -278,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 MyApplication.todayWeather.setType(xmlPullParser.getText());
                                 typeCount++;
                             }
-                        } else if(weatherStep==2){
+                        } else if(weatherStep==2){          //读取明天的天气信息
                             if (xmlPullParser.getName().equals("type") && typeCount == 0) {
                                 eventType = xmlPullParser.next();
                                 MyApplication.forecastWeather.setType(xmlPullParser.getText());
@@ -300,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 MyApplication.forecastWeather.setDate(xmlPullParser.getText());
                                 dateCount++;
                             }
-                        } else if(weatherStep==3){
+                        } else if(weatherStep==3){           //读取后天的天气信息
                             if (xmlPullParser.getName().equals("type") && typeCount == 0) {
                                 eventType = xmlPullParser.next();
                                 MyApplication.forecastWeather2.setType(xmlPullParser.getText());
@@ -327,7 +328,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     // 判断当前事件是否为标签元素结束事件
                     case XmlPullParser.END_TAG:
-                        if(xmlPullParser.getName().equals("weather")){
+                        if(xmlPullParser.getName().equals("weather")){      //根据xml内容可知，一个weather标签内是一天的天气信息
                             isForecast=true;
                             weatherStep++;
                             fengliCount=0;
@@ -363,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fragmentPager=new FragmentPager(getSupportFragmentManager(),vpager);
     }
 
-    void chooseWeatherImg(TodayWeather weather){
+    void chooseWeatherImg(TodayWeather weather){            //根据当前天气信息，更改天气图片
         int pm=0;
         String updatetime="";
         if(null!=weather){
@@ -372,48 +373,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(null!=weather.getPm25())
                 pm=Integer.parseInt(weather.getPm25());
             if(pm<=50){
-                MyApplication.pmImg.setImageResource(R.drawable.biz_plugin_weather_0_50);
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_0_50);
             }else if(pm<=100){
-                MyApplication.pmImg.setImageResource(R.drawable.biz_plugin_weather_51_100);
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_51_100);
             }else if(pm<=150){
-                MyApplication.pmImg.setImageResource(R.drawable.biz_plugin_weather_101_150);
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_101_150);
             }else if(pm<=200){
-                MyApplication.pmImg.setImageResource(R.drawable.biz_plugin_weather_151_200);
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_151_200);
             }else if(pm<=300){
-                MyApplication.pmImg.setImageResource(R.drawable.biz_plugin_weather_201_300);
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_201_300);
             }else{
-                MyApplication.pmImg.setImageResource(R.drawable.biz_plugin_weather_greater_300);
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_greater_300);
             }
+            MyApplication.todayWeather.setPmImg(pmImg);
             changeImg(updatetime,weather.getType());
         }
     }
     public void changeImg(String updatetime,String type){
         int nowTime=Integer.parseInt(updatetime);
-        if(nowTime>=6&&nowTime<19){
+        if(nowTime>=6&&nowTime<19){         //代表早上时间
             switch(type){
                 case "多云转晴":
-                    MyApplication.weatherImg.setImageResource(R.drawable.cloudy_with_rain);
+                    weatherImg.setImageResource(R.drawable.cloudy_with_rain);
                     break;
                 case "晴":
-                    MyApplication.weatherImg.setImageResource(R.drawable.sun);
+                    weatherImg.setImageResource(R.drawable.sun);
                     break;
                 case "多云":
-                    MyApplication.weatherImg.setImageResource(R.drawable.cloudy);
+                    weatherImg.setImageResource(R.drawable.cloudy);
                 default:
             }
         }else{
-            switch(type){
+            switch(type){                   //代表晚上时间
                 case "多云转晴":
-                    MyApplication.weatherImg.setImageResource(R.drawable.cloudy_with_rain_night);
+                    weatherImg.setImageResource(R.drawable.cloudy_with_rain_night);
                     break;
                 case "晴":
-                    MyApplication.weatherImg.setImageResource(R.drawable.sun_night);
+                    weatherImg.setImageResource(R.drawable.sun_night);
                     break;
                 case "多云":
-                    MyApplication.weatherImg.setImageResource(R.drawable.cloudy_night);
+                    weatherImg.setImageResource(R.drawable.cloudy_night);
                 default:
             }
         }
+        MyApplication.todayWeather.setWeatherImg(weatherImg);
     }
     void updateWeatherData(){
         //SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);

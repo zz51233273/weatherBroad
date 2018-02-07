@@ -36,6 +36,6 @@ public class MyFragment3 extends Fragment {
         t.setText(MyApplication.forecastWeather2.getType());
         t = (TextView) view.findViewById(R.id.wind);
         t.setText("风力:"+MyApplication.forecastWeather2.getFengli());
-        MyApplication.changeImg("6",MyApplication.forecastWeather2.getType(),view);
+        MyApplication.changeImg("6",MyApplication.forecastWeather2.getType(),view,2);
     }
 }

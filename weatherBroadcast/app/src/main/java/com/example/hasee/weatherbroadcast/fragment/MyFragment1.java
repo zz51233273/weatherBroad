@@ -46,14 +46,12 @@ public class MyFragment1 extends Fragment {
         t.setText("风力:"+MyApplication.todayWeather.getFengli());
 
         ImageView i=(ImageView) view.findViewById(R.id.pm2_5_img);
-        i.setImageDrawable(MyApplication.pmImg.getDrawable());
+        i.setImageDrawable(MyApplication.todayWeather.getPmImg().getDrawable());
         i=(ImageView) view.findViewById(R.id.weather_img);
-        i.setImageDrawable(MyApplication.weatherImg.getDrawable());
-        i=(ImageView)view.findViewById(R.id.pm2_5_img);
-        i.setImageDrawable(MyApplication.pmImg.getDrawable());
+        i.setImageDrawable(MyApplication.todayWeather.getWeatherImg().getDrawable());
         String updatetime="";
         updatetime=MyApplication.todayWeather.getUpdatetime();
         updatetime=updatetime.substring(0,updatetime.indexOf(":"));
-        MyApplication.changeImg(updatetime,MyApplication.todayWeather.getType(),view);
+        MyApplication.changeImg(updatetime,MyApplication.todayWeather.getType(),view,0);
     }
 }

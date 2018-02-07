@@ -6,17 +6,23 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.baidu.speech.asr.SpeechConstant;
 import com.example.hasee.weatherbroadcast.R;
 import com.example.hasee.weatherbroadcast.database.City;
 import com.example.hasee.weatherbroadcast.database.DBHelper;
+import com.example.hasee.weatherbroadcast.speechrecognizer.MyEventListener;
+
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -30,9 +36,10 @@ import java.util.Set;
  * Created by hasee on 2018/1/27.
  */
 
-public class SelectCity extends Activity implements AdapterView.OnItemSelectedListener,View.OnClickListener  {
+public class SelectCity extends Activity implements AdapterView.OnItemSelectedListener,View.OnClickListener ,View.OnTouchListener  {
 
     private ImageView mBackBtn;
+    private Button speak;
     private ArrayAdapter<String> adapter1;
     private ArrayAdapter<String> adapter2;
     private Spinner spinner1;
@@ -46,10 +53,15 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
     private SQLiteDatabase database;    //用于创建数据库对象
     private boolean flag;
     private ImageView bg;
+    private MyEventListener myEventListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select_city);
+        speak=(Button)findViewById(R.id.speak);
+        speak.setOnClickListener(this);
+        speak.setOnTouchListener(this);
         testview=(TextView)findViewById(R.id.title_name);
         mBackBtn = (ImageView) findViewById(R.id.title_back);
         mBackBtn.setOnClickListener(this);
@@ -82,6 +94,7 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
         spinner1.setTag(1);     //设置标签，用于判断当前选择了哪一个下拉框
         spinner2.setTag(2);
         chooseBackground();
+        myEventListener=new MyEventListener(this,SelectCity.this);
     }
     @Override
     public void onClick(View v) {
@@ -94,6 +107,27 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
         }
     }
 
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {         //监听按下抬起事件
+        if(v.getId() == R.id.speak){
+            if(event.getAction() == MotionEvent.ACTION_DOWN) {  //按下
+                myEventListener.getStartFunction();
+            }
+            else if(event.getAction()==MotionEvent.ACTION_UP){  //抬起
+                flag=false;
+                myEventListener.getStopFunction();
+                String city=myEventListener.getCitySpeaked();
+                database=dbHelper.getWritableDatabase();
+                Cursor cursor=dbHelper.QueryProvinceByCity(database,city);
+                if(cursor.moveToFirst()){
+                    int pos=adapter1.getPosition(cursor.getString(cursor.getColumnIndex(City.KEY_PROVINCE)));   //得到一个省在下拉框中的位置
+                    spinner1.setSelection(pos);
+                    changeCityByProvince(city);
+                }
+            }
+        }
+        return false;
+    }
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         int tag=(Integer) parent.getTag();
@@ -142,10 +176,11 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
                 spinner1.setSelection(pos);
             }
         }
+        changeCityByProvince(defCity);
+    }
 
-        /*
-            根据选择的省份，实时变化城市选项
-        */
+    void changeCityByProvince(String city){    //根据选择的省份，实时变化城市选项
+        Cursor cursor=null;
         cityName = (String) spinner1.getSelectedItem();
         testview.setText(cityName);
         cursor=dbHelper.QueryByProvince(database,cityName);  //读取城市信息
@@ -154,12 +189,14 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
         addCitysAndCodes(cursor);
         adapter2.notifyDataSetChanged();                       //通知spinner刷新数据 ***** 很必要
         if(!flag&&!"".equals(getIntent().getStringExtra("keycode"))){       //设置城市默认值，此页面中只执行一次
-            int pos=adapter2.getPosition(defCity);      //得到defCity这个城市在下拉框中的位置
-            spinner2.setSelection(pos);             //设置spinner2下拉框默认值
+            adapter2.notifyDataSetChanged();                       //通知spinner刷新数据 ***** 很必要
+            int pos=adapter2.getPosition(city);      //得到defCity这个城市在下拉框中的位置
+            spinner2.setSelection(pos);               //设置spinner2下拉框默认值
             flag=true;
         }
         database.close();
     }
+
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
     }
@@ -188,5 +225,19 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
                 codes.add(String.valueOf(c.getCode()));
             } while (cursor.moveToNext());
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myEventListener.getAsr().send(SpeechConstant.ASR_CANCEL, "{}", null, 0, 0);
+        if (myEventListener.getEnableOffline()) {
+            myEventListener.getUnloadOfflineEngine(); // 测试离线命令词请开启, 测试 ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH 参数时开启
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // 此处为android 6.0以上动态授权的回调，用户自行实现。
     }
 }

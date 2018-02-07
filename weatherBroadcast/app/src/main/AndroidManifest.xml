@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -37,6 +38,22 @@
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="QzAsqcOauDmNdtteAFB6CBcoxA01SRhk"/>
+
+        <meta-data
+            android:name="com.baidu.speech.APP_ID"
+            android:value="10805545" />
+        <!-- 请填写应用实际的API_KEY -->
+        <meta-data
+            android:name="com.baidu.speech.API_KEY"
+            android:value="jb5Iu0DZ2YH4DiPG5DUfH4ja" />
+        <!-- 请填写应用实际的SECRET_KEY -->
+        <meta-data
+            android:name="com.baidu.speech.SECRET_KEY"
+            android:value="c4I1tZzsw3tVGKzsscRooU17DWSktCNw" />
+        <service
+            android:name="com.baidu.speech.VoiceRecognitionService"
+            android:exported="false" />
+
     </application>
 
 </manifest>

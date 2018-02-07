@@ -1,5 +1,7 @@
 package com.example.hasee.weatherbroadcast.bean;
 
+import android.widget.ImageView;
+
 /**
  * Created by hasee on 2018/2/6.
  */
@@ -11,6 +13,7 @@ public class ForecastWeather {
     private String type;
     private String fengli;
     private String date;
+    private ImageView weatherImg;
 
     public String getDate() {
         return date;
@@ -36,6 +39,8 @@ public class ForecastWeather {
         return type;
     }
 
+    public ImageView getWeatherImg(){return weatherImg;}
+
     public void setCity(String city) {
         this.city = city;
     }
@@ -59,6 +64,8 @@ public class ForecastWeather {
     public void setDate(String date) {
         this.date = date;
     }
+
+    public void setWeatherImg(ImageView weatherImg){this.weatherImg=weatherImg;}
 
     public String toString() {
         return "TodayWeather{" +
