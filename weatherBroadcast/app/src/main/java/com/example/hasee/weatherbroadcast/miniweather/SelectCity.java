@@ -119,9 +119,9 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
             }
             else if(event.getAction()==MotionEvent.ACTION_UP){  //抬起
                 flag=false;
-                myEventListener.getStopFunction();
-                String city=myEventListener.getCitySpeaked();
-                database=dbHelper.getWritableDatabase();
+                myEventListener.getStopFunction();              //停止语音识别
+                String city=myEventListener.getCitySpeaked();   //记录语音识别结果
+                database=dbHelper.getWritableDatabase();        //通过数据库查找结果
                 Cursor cursor=dbHelper.QueryProvinceByCity(database,city);
                 if(cursor.moveToFirst()){
                     MediaPlayer.create(this, R.raw.bdspeech_recognition_success).start();
@@ -129,9 +129,9 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
                     spinner1.setSelection(pos);
                     changeCityByProvince(city);
                 }else{
-                    if (" ".equals(city)||"".equals(city)){
+                    if (" ".equals(city)||"".equals(city)){       //还未还得及识别
                         Toast.makeText(this,"说完后按的时间长一点",Toast.LENGTH_LONG).show();
-                    }else{
+                    }else{                                        //没有搜索到指定城市
                         Toast.makeText(this,"未搜索到指定城市",Toast.LENGTH_LONG).show();
                     }
                     MediaPlayer.create(this, R.raw.bdspeech_recognition_error).start();

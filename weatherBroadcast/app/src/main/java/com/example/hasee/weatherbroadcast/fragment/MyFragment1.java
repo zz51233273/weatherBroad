@@ -26,7 +26,6 @@ public class MyFragment1 extends Fragment {
         return view;
     }
     public void initToday(View view){
-
         TextView t = (TextView) view.findViewById(R.id.city);
         t.setText(MyApplication.todayWeather.getCity());
         t = (TextView) view.findViewById(R.id.time);
@@ -49,9 +48,6 @@ public class MyFragment1 extends Fragment {
         i.setImageDrawable(MyApplication.todayWeather.getPmImg().getDrawable());
         i=(ImageView) view.findViewById(R.id.weather_img);
         i.setImageDrawable(MyApplication.todayWeather.getWeatherImg().getDrawable());
-        String updatetime="";
-        updatetime=MyApplication.todayWeather.getUpdatetime();
-        updatetime=updatetime.substring(0,updatetime.indexOf(":"));
-        MyApplication.changeImg(updatetime,MyApplication.todayWeather.getType(),view,0);
+        MyApplication.changeImg(MyApplication.todayWeather.getType(),view,0);
     }
 }

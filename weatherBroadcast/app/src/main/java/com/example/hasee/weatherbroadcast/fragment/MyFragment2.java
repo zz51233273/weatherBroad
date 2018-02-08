@@ -1,13 +1,12 @@
 package com.example.hasee.weatherbroadcast.fragment;
 
-import android.app.AlertDialog;
+import android.view.View;
+import android.support.v7.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -39,13 +38,13 @@ public class MyFragment2 extends Fragment implements View.OnClickListener{
         t.setText(MyApplication.forecastWeather.getType());
         t = (TextView) view.findViewById(R.id.wind);
         t.setText("风力:"+MyApplication.forecastWeather.getFengli());
-        MyApplication.changeImg("6",MyApplication.forecastWeather.getType(),view,1);
+        MyApplication.changeImg(MyApplication.forecastWeather.getType(),view,1);
         ImageView cloth=(ImageView)view.findViewById(R.id.cloth);
         cloth.setOnClickListener(this);
     }
 
     @Override
-    public void onClick(View view){
+    public void onClick(View view){         //点击衣服图标，弹出穿衣推荐对话框
         if(view.getId()==R.id.cloth){
             AlertDialog.Builder dialog = new AlertDialog.Builder(view.getContext(),R.style.AlertDialogCustom);
             dialog.setTitle("穿衣推荐");

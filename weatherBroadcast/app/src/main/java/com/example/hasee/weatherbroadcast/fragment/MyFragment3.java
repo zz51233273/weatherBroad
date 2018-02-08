@@ -39,21 +39,22 @@ public class MyFragment3 extends Fragment implements View.OnClickListener{
         t.setText(MyApplication.forecastWeather2.getType());
         t = (TextView) view.findViewById(R.id.wind);
         t.setText("风力:"+MyApplication.forecastWeather2.getFengli());
-        MyApplication.changeImg("6",MyApplication.forecastWeather2.getType(),view,2);
+        MyApplication.changeImg(MyApplication.forecastWeather2.getType(),view,2);
         ImageView cloth=(ImageView)view.findViewById(R.id.cloth);
         cloth.setOnClickListener(this);
     }
 
     @Override
-    public void onClick(View view){
+    public void onClick(View view){         //点击衣服图标，弹出穿衣推荐对话框
         if(view.getId()==R.id.cloth){
-            final AlertDialog.Builder dialog = new AlertDialog.Builder(view.getContext(),R.style.AlertDialogCustom);
+            AlertDialog.Builder dialog = new AlertDialog.Builder(view.getContext(),R.style.AlertDialogCustom);
             dialog.setTitle("穿衣推荐");
             dialog.setMessage(MyApplication.forecastWeather.getCloth());
             dialog.setCancelable(false);
             dialog.setNegativeButton("返回", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
+
                 }
             });
             dialog.show();
