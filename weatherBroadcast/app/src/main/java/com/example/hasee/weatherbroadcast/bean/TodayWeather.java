@@ -123,9 +123,9 @@ public class TodayWeather {
         this.type = type;
     }
 
-    public void setWeatherImg(ImageView weatherImg){this.weatherImg=weatherImg;}
+    public void setWeatherImg(ImageView weatherImg){this.weatherImg = weatherImg;}
 
-    public void setPmImg(ImageView pmImg){this.pmImg=pmImg;}
+    public void setPmImg(ImageView pmImg){this.pmImg = pmImg;}
 
     @Override
     public String toString() {

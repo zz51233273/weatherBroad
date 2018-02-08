@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_info_port);
         vpager = (ViewPager) findViewById(R.id.vpager);
-
         init();
         new DBManager(getApplicationContext()).writeData();
     }
@@ -104,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         initView();
         JudgePermission();
+
     }
 
     void initView(){        //初始化对象
@@ -221,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             int eventType = xmlPullParser.getEventType();
             boolean isForecast=false;
             int weatherStep=1;      //初始值代表当前天气信息
+            int zhiShu=0;           //代表某一个指数
             Log.d("myWeather", "parseXML");
             while (eventType != XmlPullParser.END_DOCUMENT) {       //读取xml相应内容
                 switch (eventType) {
@@ -234,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             MyApplication.forecastWeather=new ForecastWeather();
                             MyApplication.forecastWeather2=new ForecastWeather();
                         }
-                        if (!isForecast&&MyApplication.todayWeather != null) {
+                        if (!isForecast && MyApplication.todayWeather != null) {
                             if (xmlPullParser.getName().equals("city")) {
                                 eventType = xmlPullParser.next();
                                 MyApplication.todayWeather.setCity(xmlPullParser.getText());
@@ -278,6 +279,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 eventType = xmlPullParser.next();
                                 MyApplication.todayWeather.setType(xmlPullParser.getText());
                                 typeCount++;
+                            }else if(xmlPullParser.getName().equals("name")){
+                                zhiShu++;
+                            }else if(xmlPullParser.getName().equals("detail")&&zhiShu==3){      //穿衣指数
+                                eventType = xmlPullParser.next();
+                                MyApplication.forecastWeather.setCloth(xmlPullParser.getText());
+                                MyApplication.forecastWeather2.setCloth(xmlPullParser.getText());
+                                isForecast=true;
                             }
                         } else if(weatherStep==2){          //读取明天的天气信息
                             if (xmlPullParser.getName().equals("type") && typeCount == 0) {
@@ -336,6 +344,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             lowCount=0;
                             highCount=0;
                             typeCount=0;
+                        }else if(xmlPullParser.getName().equals("forecast")){
+                            isForecast=false;
                         }
                         break;
                 }
@@ -392,6 +402,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void changeImg(String updatetime,String type){
         int nowTime=Integer.parseInt(updatetime);
         if(nowTime>=6&&nowTime<19){         //代表早上时间
+            if(nowTime==18) findViewById(R.id.title).setBackgroundResource(R.drawable.main_dusk);
+            else findViewById(R.id.title).setBackgroundResource(R.drawable.main_sun);
             switch(type){
                 case "多云转晴":
                     weatherImg.setImageResource(R.drawable.cloudy_with_rain);
@@ -404,6 +416,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 default:
             }
         }else{
+            findViewById(R.id.title).setBackgroundResource(R.drawable.main_night);
             switch(type){                   //代表晚上时间
                 case "多云转晴":
                     weatherImg.setImageResource(R.drawable.cloudy_with_rain_night);

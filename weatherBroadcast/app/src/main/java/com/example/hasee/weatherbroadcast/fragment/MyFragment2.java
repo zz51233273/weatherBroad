@@ -1,5 +1,7 @@
 package com.example.hasee.weatherbroadcast.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
@@ -14,7 +16,7 @@ import com.example.hasee.weatherbroadcast.R;
 import com.example.hasee.weatherbroadcast.app.MyApplication;
 
 
-public class MyFragment2 extends Fragment {
+public class MyFragment2 extends Fragment implements View.OnClickListener{
 
     public MyFragment2() {
     }
@@ -38,5 +40,24 @@ public class MyFragment2 extends Fragment {
         t = (TextView) view.findViewById(R.id.wind);
         t.setText("风力:"+MyApplication.forecastWeather.getFengli());
         MyApplication.changeImg("6",MyApplication.forecastWeather.getType(),view,1);
+        ImageView cloth=(ImageView)view.findViewById(R.id.cloth);
+        cloth.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View view){
+        if(view.getId()==R.id.cloth){
+            AlertDialog.Builder dialog = new AlertDialog.Builder(view.getContext(),R.style.AlertDialogCustom);
+            dialog.setTitle("穿衣推荐");
+            dialog.setMessage(MyApplication.forecastWeather.getCloth());
+            dialog.setCancelable(false);
+            dialog.setNegativeButton("返回", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                }
+            });
+            dialog.show();
+        }
     }
 }

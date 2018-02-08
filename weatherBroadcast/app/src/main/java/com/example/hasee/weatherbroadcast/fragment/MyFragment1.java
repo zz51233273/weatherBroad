@@ -26,6 +26,7 @@ public class MyFragment1 extends Fragment {
         return view;
     }
     public void initToday(View view){
+
         TextView t = (TextView) view.findViewById(R.id.city);
         t.setText(MyApplication.todayWeather.getCity());
         t = (TextView) view.findViewById(R.id.time);
@@ -44,7 +45,6 @@ public class MyFragment1 extends Fragment {
         t.setText(MyApplication.todayWeather.getType());
         t = (TextView) view.findViewById(R.id.wind);
         t.setText("风力:"+MyApplication.todayWeather.getFengli());
-
         ImageView i=(ImageView) view.findViewById(R.id.pm2_5_img);
         i.setImageDrawable(MyApplication.todayWeather.getPmImg().getDrawable());
         i=(ImageView) view.findViewById(R.id.weather_img);

@@ -13,6 +13,7 @@ public class ForecastWeather {
     private String type;
     private String fengli;
     private String date;
+    private String cloth;
     private ImageView weatherImg;
 
     public String getDate() {
@@ -41,6 +42,8 @@ public class ForecastWeather {
 
     public ImageView getWeatherImg(){return weatherImg;}
 
+    public String getCloth(){return cloth;}
+
     public void setCity(String city) {
         this.city = city;
     }
@@ -66,6 +69,8 @@ public class ForecastWeather {
     }
 
     public void setWeatherImg(ImageView weatherImg){this.weatherImg=weatherImg;}
+
+    public void setCloth(String cloth){this.cloth = cloth;}
 
     public String toString() {
         return "TodayWeather{" +

@@ -21,6 +21,8 @@ public class MyApplication {
         ImageView i=(ImageView) view.findViewById(R.id.weather_img);
         int nowTime=Integer.parseInt(updatetime);
         if(nowTime>=6&&nowTime<19){
+            if(nowTime==18) view.findViewById(R.id.weather_today).setBackgroundResource(R.drawable.main_dusk);
+            else view.findViewById(R.id.weather_today).setBackgroundResource(R.drawable.main_sun);
             switch(type){
                 case "多云转晴":
                     i.setImageResource(R.drawable.cloudy_with_rain);
@@ -43,6 +45,7 @@ public class MyApplication {
                 default:
             }
         }else{
+            view.findViewById(R.id.weather_today).setBackgroundResource(R.drawable.main_night);
             switch(type){
                 case "多云转晴":
                     i.setImageResource(R.drawable.cloudy_with_rain_night);
@@ -60,6 +63,7 @@ public class MyApplication {
                     i.setImageResource(R.drawable.multycloudy);
                     break;
                 case "阵雨":
+                    view.findViewById(R.id.weather_today).setBackgroundResource(R.drawable.main_night);
                     i.setImageResource(R.drawable.shower);
                     break;
                 default:
