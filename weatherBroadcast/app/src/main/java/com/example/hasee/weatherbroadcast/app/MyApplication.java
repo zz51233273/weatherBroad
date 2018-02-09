@@ -13,8 +13,7 @@ import com.example.hasee.weatherbroadcast.bean.TodayWeather;
  */
 
 public class MyApplication {
-    public static ForecastWeather forecastWeather=null; //明天
-    public static ForecastWeather forecastWeather2=null; //后天
+    public static ForecastWeather forecastWeather[];        //未来四天的天气
     public static TodayWeather todayWeather = null;
 
     public static void changeImg(String type,View view,int pos){
@@ -76,11 +75,6 @@ public class MyApplication {
                     break;
                 default:
             }
-        }
-        if(pos==1){
-            forecastWeather.setWeatherImg(i);
-        }else if(pos==2){
-            forecastWeather2.setWeatherImg(i);
         }
     }
 }

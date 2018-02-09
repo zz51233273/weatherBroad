@@ -11,10 +11,8 @@ public class ForecastWeather {
     private String high;
     private String low;
     private String type;
-    private String fengli;
     private String date;
-    private String cloth;
-    private ImageView weatherImg;
+    private int weatherImg;
 
     public String getDate() {
         return date;
@@ -22,10 +20,6 @@ public class ForecastWeather {
 
     public String getCity() {
         return city;
-    }
-
-    public String getFengli() {
-        return fengli;
     }
 
     public String getHigh() {
@@ -40,16 +34,10 @@ public class ForecastWeather {
         return type;
     }
 
-    public ImageView getWeatherImg(){return weatherImg;}
-
-    public String getCloth(){return cloth;}
+    public int getWeatherImg(){return weatherImg;}
 
     public void setCity(String city) {
         this.city = city;
-    }
-
-    public void setFengli(String fengli) {
-        this.fengli = fengli;
     }
 
     public void setHigh(String high) {
@@ -68,14 +56,11 @@ public class ForecastWeather {
         this.date = date;
     }
 
-    public void setWeatherImg(ImageView weatherImg){this.weatherImg=weatherImg;}
-
-    public void setCloth(String cloth){this.cloth = cloth;}
+    public void setWeatherImg(int weatherImg){this.weatherImg=weatherImg;}
 
     public String toString() {
         return "TodayWeather{" +
                 "city='" + city + '\'' +
-                ", fengli='" + fengli + '\'' +
                 ", high='" + high + '\'' +
                 ", low='" + low + '\'' +
                 ", type='" + type + '\'' +

@@ -37,9 +37,8 @@ public class FragmentPager implements ViewPager.OnPageChangeListener{
 
     @Override
     public void onPageScrollStateChanged(int state) {
-
         //state的状态有三个，0表示什么都没做，1正在滑动，2滑动完毕
-        if (state == 2) {
+/*        if (state == 2) {
             switch (vpager.getCurrentItem()) {
                 case PAGE_ONE:
                     break;
@@ -48,6 +47,6 @@ public class FragmentPager implements ViewPager.OnPageChangeListener{
                 case PAGE_THREE:
                     break;
             }
-        }
+        }*/
     }
 }

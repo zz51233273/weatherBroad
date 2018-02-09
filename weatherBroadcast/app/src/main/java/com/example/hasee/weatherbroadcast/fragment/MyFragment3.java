@@ -8,56 +8,105 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.app.AlertDialog;
 
 import com.example.hasee.weatherbroadcast.R;
+import com.example.hasee.weatherbroadcast.adapter.WeatherForecastAdapter;
 import com.example.hasee.weatherbroadcast.app.MyApplication;
-import com.example.hasee.weatherbroadcast.miniweather.MainActivity;
+import com.example.hasee.weatherbroadcast.bean.ForecastWeather;
+import com.example.hasee.weatherbroadcast.bean.ForecastWeatherItem;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class MyFragment3 extends Fragment implements View.OnClickListener{
+public class MyFragment3 extends Fragment{
 
+    private List<ForecastWeatherItem> forecastItemList = new ArrayList<ForecastWeatherItem>();
     public MyFragment3() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.weather_info_forecast, container, false);
-        initTomorrowAf(view);
+        View view = inflater.inflate(R.layout.weather_broadcast_list, container, false);
+        forecastItemList.clear();
+        initForecastItem();
+        WeatherForecastAdapter weatherForecastAdapter=new WeatherForecastAdapter(getContext(),R.layout.weatherforcast_item,forecastItemList);
+        ListView listView=(ListView)view.findViewById(R.id.wListView);
+        listView.setAdapter(weatherForecastAdapter);
         return view;
     }
 
-    public void initTomorrowAf(View view){       //更新后天的天气信息
-        TextView t = (TextView) view.findViewById(R.id.city);
-        t.setText(MyApplication.forecastWeather.getCity());
-        t = (TextView) view.findViewById(R.id.week_today);
-        t.setText(MyApplication.forecastWeather2.getDate());
-        t = (TextView) view.findViewById(R.id.temperature);
-        t.setText(MyApplication.forecastWeather2.getLow()+" ~ "+MyApplication.forecastWeather2.getHigh());
-        t = (TextView) view.findViewById(R.id.climate);
-        t.setText(MyApplication.forecastWeather2.getType());
-        t = (TextView) view.findViewById(R.id.wind);
-        t.setText("风力:"+MyApplication.forecastWeather2.getFengli());
-        MyApplication.changeImg(MyApplication.forecastWeather2.getType(),view,2);
-        ImageView cloth=(ImageView)view.findViewById(R.id.cloth);
-        cloth.setOnClickListener(this);
+    private void initForecastItem(){
+        ForecastWeatherItem forecastWeatherItem=null;
+        int pos=MyApplication.forecastWeather.length;
+        for (int i=0;i<pos;i++){
+            changeImg(MyApplication.forecastWeather[i]);
+            forecastWeatherItem=new ForecastWeatherItem(MyApplication.forecastWeather[i].getDate(),
+                    MyApplication.forecastWeather[i].getLow()+" ~ "+MyApplication.forecastWeather[i].getHigh()
+                    , MyApplication.forecastWeather[i].getType()
+                    , MyApplication.forecastWeather[i].getWeatherImg());
+            forecastItemList.add(forecastWeatherItem);
+        }
     }
-
-    @Override
-    public void onClick(View view){         //点击衣服图标，弹出穿衣推荐对话框
-        if(view.getId()==R.id.cloth){
-            AlertDialog.Builder dialog = new AlertDialog.Builder(view.getContext(),R.style.AlertDialogCustom);
-            dialog.setTitle("穿衣推荐");
-            dialog.setMessage(MyApplication.forecastWeather.getCloth());
-            dialog.setCancelable(false);
-            dialog.setNegativeButton("返回", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-
-                }
-            });
-            dialog.show();
+    public void changeImg(ForecastWeather forecastWeather){
+        String updatetime="";
+        updatetime=MyApplication.todayWeather.getUpdatetime();
+        updatetime=updatetime.substring(0,updatetime.indexOf(":"));
+        int nowTime=Integer.parseInt(updatetime);
+        String type=forecastWeather.getType();
+        if(nowTime>=6&&nowTime<19){
+            switch(type){
+                case "多云转晴":
+                    forecastWeather.setWeatherImg(R.drawable.cloudy_with_rain);
+                    break;
+                case "晴":
+                    forecastWeather.setWeatherImg(R.drawable.sun);
+                    break;
+                case "多云":
+                    forecastWeather.setWeatherImg(R.drawable.cloudy);
+                    break;
+                case "小雨":
+                    forecastWeather.setWeatherImg(R.drawable.small_rain);
+                    break;
+                case  "阴":
+                    forecastWeather.setWeatherImg(R.drawable.multycloudy);
+                    break;
+                case "阵雨":
+                    forecastWeather.setWeatherImg(R.drawable.shower);
+                    break;
+                case "雨夹雪":
+                    forecastWeather.setWeatherImg(R.drawable.rain_with_snow);
+                    break;
+                default:
+            }
+        }else{
+            switch(type){
+                case "多云转晴":
+                    forecastWeather.setWeatherImg(R.drawable.cloudy_with_rain_night);
+                    break;
+                case "晴":
+                    forecastWeather.setWeatherImg(R.drawable.sun_night);
+                    break;
+                case "多云":
+                    forecastWeather.setWeatherImg(R.drawable.cloudy_night);
+                    break;
+                case "小雨":
+                    forecastWeather.setWeatherImg(R.drawable.small_rain);
+                    break;
+                case "阴":
+                    forecastWeather.setWeatherImg(R.drawable.multycloudy);
+                    break;
+                case "阵雨":
+                    forecastWeather.setWeatherImg(R.drawable.shower);
+                    break;
+                case "雨夹雪":
+                    forecastWeather.setWeatherImg(R.drawable.rain_with_snow);
+                    break;
+                default:
+            }
         }
     }
 }

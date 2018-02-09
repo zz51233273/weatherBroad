@@ -231,7 +231,6 @@
                         android:layout_below="@id/temperature"
                         android:gravity="center"
                         android:layout_marginTop="10dip"
-
                         android:text="多云转晴"
                         android:textColor="@android:color/white"
                         android:textSize="20sp" />
@@ -243,7 +242,6 @@
                         android:layout_below="@id/climate"
                         android:gravity="center"
                         android:layout_marginTop="10dp"
-
                         android:text="微风"
                         android:textColor="@android:color/white"
                         android:textSize="20sp" />

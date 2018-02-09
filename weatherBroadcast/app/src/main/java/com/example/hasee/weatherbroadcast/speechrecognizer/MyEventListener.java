@@ -35,9 +35,9 @@ public class MyEventListener implements EventListener {
     private Activity activity;
 
     private EventManager asr;
-
     private String citySpeaked="";
     private boolean enableOffline = false; // 测试离线命令词，需要改成true
+    public static boolean isListening=false;
 
     public MyEventListener(Context context,Activity activity){
         this.context=context;
@@ -57,6 +57,7 @@ public class MyEventListener implements EventListener {
      * 测试参数填在这里
      */
     private void start() {
+        isListening=true;
         citySpeaked="";
         Map<String, Object> params = new LinkedHashMap<String, Object>();
         String event = null;
@@ -72,6 +73,7 @@ public class MyEventListener implements EventListener {
     }
 
     private void stop() {
+        isListening=false;
         asr.send(SpeechConstant.ASR_STOP, null, null, 0, 0); //
     }
 
@@ -114,8 +116,8 @@ public class MyEventListener implements EventListener {
 
                 }
             }
-        } else if (data != null) {
-
+        }else if (name.equals(SpeechConstant.CALLBACK_EVENT_ASR_FINISH)){
+            isListening=false;
         }
     }
 

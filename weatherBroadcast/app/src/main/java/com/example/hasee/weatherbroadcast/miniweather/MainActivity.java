@@ -52,7 +52,6 @@ import com.example.hasee.weatherbroadcast.util.NetUtil;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int UPDATE_TODAY_WEATHER = 1;
-    private static final int UPDATE_TOMORROW_WEATHER = 2;
     private BDLocationListener BaiDuListener = new MyLocation(this);
     private LocationClient mLocationClient = null;
     private LocationClientOption option = new LocationClientOption();
@@ -74,15 +73,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case UPDATE_TODAY_WEATHER:
                     updateTodayWeather((TodayWeather) msg.obj);
                     break;
-                case UPDATE_TOMORROW_WEATHER:
-                    break;
                 default:
                     break;
             }
         }
-
     };
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateWeatherData();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         climateTv.setText("");
         windTv.setText("");
         weatherImg.setImageResource(R.drawable.na);
-        updateWeatherData();
+
     }
 
     @Override
@@ -220,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             xmlPullParser.setInput(new StringReader(xmldata));
             int eventType = xmlPullParser.getEventType();
             boolean isForecast=false;
-            int weatherStep=1;      //初始值代表当前天气信息
+            int weatherStep=0;      //初始值代表当前天气信息
             int zhiShu=0;           //代表某一个指数
             Log.d("myWeather", "parseXML");
             while (eventType != XmlPullParser.END_DOCUMENT) {       //读取xml相应内容
@@ -232,14 +233,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     case XmlPullParser.START_TAG:
                         if(xmlPullParser.getName().equals("resp")){
                             MyApplication.todayWeather= new TodayWeather();
-                            MyApplication.forecastWeather=new ForecastWeather();
-                            MyApplication.forecastWeather2=new ForecastWeather();
+                            MyApplication.forecastWeather=new ForecastWeather[4];
+                            int count=MyApplication.forecastWeather.length;
+                            for(int i=0;i<count;i++){
+                                MyApplication.forecastWeather[i]=new ForecastWeather();
+                            }
                         }
                         if (!isForecast && MyApplication.todayWeather != null) {
                             if (xmlPullParser.getName().equals("city")) {
                                 eventType = xmlPullParser.next();
                                 MyApplication.todayWeather.setCity(xmlPullParser.getText());
-                                MyApplication.forecastWeather.setCity(xmlPullParser.getText());
+                                int count=MyApplication.forecastWeather.length;
+                                for(int i=0;i<count;i++){
+                                    MyApplication.forecastWeather[i].setCity(xmlPullParser.getText());
+                                }
                             } else if (xmlPullParser.getName().equals("updatetime")) {
                                 eventType = xmlPullParser.next();
                                 MyApplication.todayWeather.setUpdatetime(xmlPullParser.getText());
@@ -281,55 +288,57 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 typeCount++;
                             }else if(xmlPullParser.getName().equals("name")){
                                 zhiShu++;
-                            }else if(xmlPullParser.getName().equals("detail")&&zhiShu==3){      //穿衣指数
-                                eventType = xmlPullParser.next();
-                                MyApplication.forecastWeather.setCloth(xmlPullParser.getText());
-                                MyApplication.forecastWeather2.setCloth(xmlPullParser.getText());
-                                isForecast=true;
+                            }else if(xmlPullParser.getName().equals("detail")){      //穿衣指数
+                                switch (zhiShu){
+                                    case 2:     //舒适度
+                                        eventType = xmlPullParser.next();
+                                        MyApplication.todayWeather.setIndex_comfort(xmlPullParser.getText());
+                                        break;
+                                    case 3:     //穿衣指数
+                                        eventType = xmlPullParser.next();
+                                        MyApplication.todayWeather.setIndex_cloth(xmlPullParser.getText());
+                                        break;
+                                    case 4:     //感冒指数
+                                        eventType = xmlPullParser.next();
+                                        MyApplication.todayWeather.setIndex_influenza(xmlPullParser.getText());
+                                        break;
+                                    case 5:     //晾晒指数
+                                        eventType = xmlPullParser.next();
+                                        MyApplication.todayWeather.setIndex_suncure(xmlPullParser.getText());
+                                        break;
+                                    case 6:     //旅游指数
+                                        eventType = xmlPullParser.next();
+                                        MyApplication.todayWeather.setIndex_tour(xmlPullParser.getText());
+                                        break;
+                                    case 7:     //紫外线强度
+                                        eventType = xmlPullParser.next();
+                                        MyApplication.todayWeather.setIndex_ultraviolet(xmlPullParser.getText());
+                                        break;
+                                    case 9:     //运动指数
+                                        eventType = xmlPullParser.next();
+                                        MyApplication.todayWeather.setIndex_sport(xmlPullParser.getText());
+                                        break;
+                                    case 10:    //约会指数
+                                        eventType = xmlPullParser.next();
+                                        MyApplication.todayWeather.setIndex_date(xmlPullParser.getText());
+                                        isForecast=true;
+                                        break;
+                                }
                             }
-                        } else if(weatherStep==2){          //读取明天的天气信息
-                            if (xmlPullParser.getName().equals("type") && typeCount == 0) {
+                        } else if(weatherStep>=1){          //读取未来几天的天气信息
+                            if (xmlPullParser.getName().equals("type") &&typeCount==0) {
                                 eventType = xmlPullParser.next();
-                                MyApplication.forecastWeather.setType(xmlPullParser.getText());
+                                MyApplication.forecastWeather[weatherStep-1].setType(xmlPullParser.getText());
                                 typeCount++;
-                            } else if (xmlPullParser.getName().equals("fengli") && fengliCount == 0) {
+                            } else if (xmlPullParser.getName().equals("high")) {
                                 eventType = xmlPullParser.next();
-                                MyApplication.forecastWeather.setFengli(xmlPullParser.getText());
-                                fengliCount++;
-                            } else if (xmlPullParser.getName().equals("high") && highCount == 0) {
+                                MyApplication.forecastWeather[weatherStep-1].setHigh(xmlPullParser.getText().substring(2).trim());
+                            } else if (xmlPullParser.getName().equals("low") ) {
                                 eventType = xmlPullParser.next();
-                                MyApplication.forecastWeather.setHigh(xmlPullParser.getText().substring(2).trim());
-                                highCount++;
-                            } else if (xmlPullParser.getName().equals("low") && lowCount == 0) {
+                                MyApplication.forecastWeather[weatherStep-1].setLow(xmlPullParser.getText().substring(2).trim());
+                            } else if (xmlPullParser.getName().equals("date") ) {
                                 eventType = xmlPullParser.next();
-                                MyApplication.forecastWeather.setLow(xmlPullParser.getText().substring(2).trim());
-                                lowCount++;
-                            }else if (xmlPullParser.getName().equals("date") && dateCount == 0) {
-                                eventType = xmlPullParser.next();
-                                MyApplication.forecastWeather.setDate(xmlPullParser.getText());
-                                dateCount++;
-                            }
-                        } else if(weatherStep==3){           //读取后天的天气信息
-                            if (xmlPullParser.getName().equals("type") && typeCount == 0) {
-                                eventType = xmlPullParser.next();
-                                MyApplication.forecastWeather2.setType(xmlPullParser.getText());
-                                typeCount++;
-                            } else if (xmlPullParser.getName().equals("fengli") && fengliCount == 0) {
-                                eventType = xmlPullParser.next();
-                                MyApplication.forecastWeather2.setFengli(xmlPullParser.getText());
-                                fengliCount++;
-                            } else if (xmlPullParser.getName().equals("high") && highCount == 0) {
-                                eventType = xmlPullParser.next();
-                                MyApplication.forecastWeather2.setHigh(xmlPullParser.getText().substring(2).trim());
-                                highCount++;
-                            } else if (xmlPullParser.getName().equals("low") && lowCount == 0) {
-                                eventType = xmlPullParser.next();
-                                MyApplication.forecastWeather2.setLow(xmlPullParser.getText().substring(2).trim());
-                                lowCount++;
-                            }else if (xmlPullParser.getName().equals("date") && dateCount == 0) {
-                                eventType = xmlPullParser.next();
-                                MyApplication.forecastWeather2.setDate(xmlPullParser.getText());
-                                dateCount++;
+                                MyApplication.forecastWeather[weatherStep-1].setDate(xmlPullParser.getText());
                             }
                         }
                         break;
@@ -339,10 +348,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if(xmlPullParser.getName().equals("weather")){      //根据xml内容可知，一个weather标签内是一天的天气信息
                             isForecast=true;
                             weatherStep++;
-                            fengliCount=0;
-                            dateCount=0;
-                            lowCount=0;
-                            highCount=0;
                             typeCount=0;
                         }else if(xmlPullParser.getName().equals("forecast")){
                             isForecast=false;
@@ -360,16 +365,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     void updateTodayWeather(TodayWeather todayWeather){         //更新当前天气信息,在Handler中被调用
-        city_name_Tv.setText(todayWeather.getCity()+"天气");
-        cityTv.setText(todayWeather.getCity());
-        timeTv.setText(todayWeather.getUpdatetime()+ "发布");
-        humidityTv.setText("湿度："+todayWeather.getShidu());
-        pmDataTv.setText(todayWeather.getPm25());
-        pmQualityTv.setText(todayWeather.getQuality());
-        weekTv.setText(todayWeather.getDate());
-        temperatureTv.setText(todayWeather.getLow()+" ~ "+todayWeather.getHigh());
-        climateTv.setText(todayWeather.getType());
-        windTv.setText("风力:"+todayWeather.getFengli());
         chooseWeatherImg(todayWeather);
         fragmentPager=new FragmentPager(getSupportFragmentManager(),vpager);
     }

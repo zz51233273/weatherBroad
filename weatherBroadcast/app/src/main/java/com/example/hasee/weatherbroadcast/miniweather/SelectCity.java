@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -15,12 +17,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.baidu.speech.asr.SpeechConstant;
 import com.example.hasee.weatherbroadcast.R;
+import com.example.hasee.weatherbroadcast.app.MyApplication;
+import com.example.hasee.weatherbroadcast.bean.TodayWeather;
 import com.example.hasee.weatherbroadcast.database.City;
 import com.example.hasee.weatherbroadcast.database.DBHelper;
 import com.example.hasee.weatherbroadcast.speechrecognizer.MyEventListener;
@@ -57,7 +62,8 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
     private boolean flag;
     private ImageView bg;
     private MyEventListener myEventListener;
-
+    private static final int UPDATE_CITY = 1;
+    private static final int CANNOT_RECOGNIZE=-1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +105,24 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
         chooseBackground();
         myEventListener=new MyEventListener(this,SelectCity.this);
     }
+
+    private Handler mHandler = new Handler() {
+        public void handleMessage(android.os.Message msg) {
+            switch (msg.what){
+                case UPDATE_CITY:
+                    spinner1.setSelection(msg.arg1);
+                    MediaPlayer.create(SelectCity.this, R.raw.bdspeech_recognition_success).start();
+                    changeCityByProvince((String) msg.obj);
+                    break;
+                case CANNOT_RECOGNIZE:
+                    Toast.makeText(SelectCity.this,"未搜索到指定城市",Toast.LENGTH_LONG).show();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -118,24 +142,36 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
                 myEventListener.getStartFunction();
             }
             else if(event.getAction()==MotionEvent.ACTION_UP){  //抬起
-                flag=false;
-                myEventListener.getStopFunction();              //停止语音识别
-                String city=myEventListener.getCitySpeaked();   //记录语音识别结果
-                database=dbHelper.getWritableDatabase();        //通过数据库查找结果
-                Cursor cursor=dbHelper.QueryProvinceByCity(database,city);
-                if(cursor.moveToFirst()){
-                    MediaPlayer.create(this, R.raw.bdspeech_recognition_success).start();
-                    int pos=adapter1.getPosition(cursor.getString(cursor.getColumnIndex(City.KEY_PROVINCE)));   //得到一个省在下拉框中的位置
-                    spinner1.setSelection(pos);
-                    changeCityByProvince(city);
-                }else{
-                    if (" ".equals(city)||"".equals(city)){       //还未还得及识别
-                        Toast.makeText(this,"说完后按的时间长一点",Toast.LENGTH_LONG).show();
-                    }else{                                        //没有搜索到指定城市
-                        Toast.makeText(this,"未搜索到指定城市",Toast.LENGTH_LONG).show();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Cursor cursor=null;
+                        database=dbHelper.getWritableDatabase();        //通过数据库查找结果
+                        String city="";
+                        while((null==cursor||!cursor.moveToFirst())&&myEventListener.isListening){  //仍为搜索到并且正在监听
+                            if(null!=cursor)cursor.close();
+                            city=myEventListener.getCitySpeaked();
+                            if(""!=city){
+                                cursor=dbHelper.QueryProvinceByCity(database,city);
+                            }
+                        }
+                        if(null!=cursor&&cursor.moveToFirst()){
+                            flag=false;
+                            int pos=adapter1.getPosition(cursor.getString(cursor.getColumnIndex(City.KEY_PROVINCE)));   //得到一个省在下拉框中的位置
+                            Message msg =new Message();
+                            msg.what = UPDATE_CITY;
+                            msg.obj = city ;
+                            msg.arg1 = pos;
+                            mHandler.sendMessage(msg);
+                        }else{
+                            Message msg =new Message();
+                            msg.what = CANNOT_RECOGNIZE;
+                            mHandler.sendMessage(msg);
+                        }
+                        if(null!=cursor)cursor.close();
+                        myEventListener.getStopFunction();              //停止语音识别
                     }
-                    MediaPlayer.create(this, R.raw.bdspeech_recognition_error).start();
-                }
+                }).start();
             }
         }
         return false;
@@ -195,14 +231,15 @@ public class SelectCity extends Activity implements AdapterView.OnItemSelectedLi
         Cursor cursor=null;
         cityName = (String) spinner1.getSelectedItem();
         testview.setText(cityName);
+        database=dbHelper.getWritableDatabase();
         cursor=dbHelper.QueryByProvince(database,cityName);  //读取城市信息
         citys.clear();      //清空原有城市数据
         codes.clear();      //清空原有相应的城市代码
         addCitysAndCodes(cursor);
         adapter2.notifyDataSetChanged();                       //通知spinner刷新数据 ***** 很必要
         if(!flag&&!"".equals(getIntent().getStringExtra("keycode"))){       //设置城市默认值，此页面中只执行一次
-            adapter2.notifyDataSetChanged();                       //通知spinner刷新数据 ***** 很必要
-            int pos=adapter2.getPosition(city);      //得到defCity这个城市在下拉框中的位置
+            adapter2.notifyDataSetChanged();                   //通知spinner刷新数据 ***** 很必要
+            int pos=adapter2.getPosition(city);      //得到city这个城市在下拉框中的位置
             spinner2.setSelection(pos);               //设置spinner2下拉框默认值
             flag=true;
         }

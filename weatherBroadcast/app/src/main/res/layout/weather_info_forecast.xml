@@ -32,7 +32,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="60dip"
                     android:layout_alignParentRight="true"
-                    android:src="@drawable/cloth" />
+                    android:src="@drawable/index_cloth" />
             </RelativeLayout>
             <!-- 天气信息块 -->
             <RelativeLayout

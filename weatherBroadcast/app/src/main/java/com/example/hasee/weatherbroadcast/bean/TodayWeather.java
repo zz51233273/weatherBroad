@@ -20,8 +20,80 @@ public class TodayWeather {
     private String high;
     private String low;
     private String type;
+    private String index_comfort;            //舒适度
+    private String index_cloth;              //穿衣指数
+    private String index_influenza;         //感冒指数
+    private String index_suncure;           //晾晒指数
+    private String index_tour;              //旅游指数
+    private String index_ultraviolet;      //紫外线指数
+    private String index_sport;             //运动指数
+    private String index_date;              //约会指数
     private ImageView weatherImg;
     private ImageView pmImg;
+
+    public String getIndex_cloth() {
+        return index_cloth;
+    }
+
+    public void setIndex_cloth(String index_cloth) {
+        this.index_cloth = index_cloth;
+    }
+
+    public String getIndex_comfort() {
+        return index_comfort;
+    }
+
+    public void setIndex_comfort(String index_comfort) {
+        this.index_comfort = index_comfort;
+    }
+
+    public String getIndex_influenza() {
+        return index_influenza;
+    }
+
+    public void setIndex_influenza(String index_influenza) {
+        this.index_influenza = index_influenza;
+    }
+
+    public String getIndex_suncure() {
+        return index_suncure;
+    }
+
+    public void setIndex_suncure(String index_suncure) {
+        this.index_suncure = index_suncure;
+    }
+
+    public String getIndex_tour() {
+        return index_tour;
+    }
+
+    public void setIndex_tour(String index_tour) {
+        this.index_tour = index_tour;
+    }
+
+    public String getIndex_ultraviolet() {
+        return index_ultraviolet;
+    }
+
+    public void setIndex_ultraviolet(String index_ultraviolet) {
+        this.index_ultraviolet = index_ultraviolet;
+    }
+
+    public String getIndex_sport() {
+        return index_sport;
+    }
+
+    public void setIndex_sport(String index_sport) {
+        this.index_sport = index_sport;
+    }
+
+    public String getIndex_date() {
+        return index_date;
+    }
+
+    public void setIndex_date(String index_date) {
+        this.index_date = index_date;
+    }
 
     public String getCity() {
         return city;

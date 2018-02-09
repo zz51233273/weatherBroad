@@ -1,62 +1,56 @@
 package com.example.hasee.weatherbroadcast.fragment;
 
 import android.view.View;
-import android.support.v7.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.ListView;
 
 import com.example.hasee.weatherbroadcast.R;
+import com.example.hasee.weatherbroadcast.adapter.IndexAdapter;
 import com.example.hasee.weatherbroadcast.app.MyApplication;
+import com.example.hasee.weatherbroadcast.bean.IndexItem;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class MyFragment2 extends Fragment implements View.OnClickListener{
+public class MyFragment2 extends Fragment{
 
+    private List<IndexItem> indexItemList = new ArrayList<IndexItem>();
     public MyFragment2() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.weather_info_forecast, container, false);
-        initTomorrow(view);
+        View view = inflater.inflate(R.layout.weather_index_list, container, false);
+        indexItemList.clear();
+        initIndex();
+        IndexAdapter indexAdapter=new IndexAdapter(getContext(),R.layout.index_item, indexItemList);
+        ListView listView=(ListView)view.findViewById(R.id.mListView);
+        listView.setAdapter(indexAdapter);
+        //initTomorrow(view);
         return view;
     }
 
-    public void initTomorrow(View view){         //更新明天的天气信息
-        TextView t = (TextView) view.findViewById(R.id.city);
-        t.setText(MyApplication.forecastWeather.getCity());
-        t = (TextView) view.findViewById(R.id.week_today);
-        t.setText(MyApplication.forecastWeather.getDate());
-        t = (TextView) view.findViewById(R.id.temperature);
-        t.setText(MyApplication.forecastWeather.getLow()+" ~ "+MyApplication.forecastWeather.getHigh());
-        t = (TextView) view.findViewById(R.id.climate);
-        t.setText(MyApplication.forecastWeather.getType());
-        t = (TextView) view.findViewById(R.id.wind);
-        t.setText("风力:"+MyApplication.forecastWeather.getFengli());
-        MyApplication.changeImg(MyApplication.forecastWeather.getType(),view,1);
-        ImageView cloth=(ImageView)view.findViewById(R.id.cloth);
-        cloth.setOnClickListener(this);
+    void initIndex(){    //初始化指数
+        IndexItem indexItem = new IndexItem("舒适度",MyApplication.todayWeather.getIndex_comfort(),R.drawable.index_comfort);
+        indexItemList.add(indexItem);
+        indexItem = new IndexItem("穿衣指数",MyApplication.todayWeather.getIndex_cloth(),R.drawable.index_cloth);
+        indexItemList.add(indexItem);
+        indexItem = new IndexItem("感冒指数",MyApplication.todayWeather.getIndex_influenza(),R.drawable.index_influenza);
+        indexItemList.add(indexItem);
+        indexItem = new IndexItem("晾晒指数",MyApplication.todayWeather.getIndex_suncure(),R.drawable.index_suncure);
+        indexItemList.add(indexItem);
+        indexItem = new IndexItem("旅游指数",MyApplication.todayWeather.getIndex_tour(),R.drawable.index_tour);
+        indexItemList.add(indexItem);
+        indexItem = new IndexItem("紫外线强度",MyApplication.todayWeather.getIndex_ultraviolet(),R.drawable.index_ultraviolet);
+        indexItemList.add(indexItem);
+        indexItem = new IndexItem("运动指数",MyApplication.todayWeather.getIndex_sport(),R.drawable.index_sport);
+        indexItemList.add(indexItem);
+        indexItem = new IndexItem("约会指数",MyApplication.todayWeather.getIndex_date(),R.drawable.index_date);
+        indexItemList.add(indexItem);
     }
 
-    @Override
-    public void onClick(View view){         //点击衣服图标，弹出穿衣推荐对话框
-        if(view.getId()==R.id.cloth){
-            AlertDialog.Builder dialog = new AlertDialog.Builder(view.getContext(),R.style.AlertDialogCustom);
-            dialog.setTitle("穿衣推荐");
-            dialog.setMessage(MyApplication.forecastWeather.getCloth());
-            dialog.setCancelable(false);
-            dialog.setNegativeButton("返回", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-
-                }
-            });
-            dialog.show();
-        }
-    }
 }
