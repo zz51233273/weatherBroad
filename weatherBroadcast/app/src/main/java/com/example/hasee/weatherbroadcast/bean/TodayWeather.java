@@ -29,7 +29,6 @@ public class TodayWeather {
     private String index_sport;             //运动指数
     private String index_date;              //约会指数
     private ImageView weatherImg;
-    private ImageView pmImg;
 
     public String getIndex_cloth() {
         return index_cloth;
@@ -145,8 +144,6 @@ public class TodayWeather {
 
     public ImageView getWeatherImg(){return weatherImg;}
 
-    public ImageView getPmImg(){return pmImg;}
-
     public void setCity(String city) {
         this.city = city;
     }
@@ -196,8 +193,6 @@ public class TodayWeather {
     }
 
     public void setWeatherImg(ImageView weatherImg){this.weatherImg = weatherImg;}
-
-    public void setPmImg(ImageView pmImg){this.pmImg = pmImg;}
 
     @Override
     public String toString() {

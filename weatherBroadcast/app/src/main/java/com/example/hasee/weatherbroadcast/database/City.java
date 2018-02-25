@@ -6,10 +6,11 @@ package com.example.hasee.weatherbroadcast.database;
 
 public class City {
     public static final String TABLE="city";//表名
-    public static final String KEY_ID = "_id";// 列名
-    public static final String KEY_PROVINCE = "province";// 列名
-    public static final String KEY_CITY = "city";// 列名
-    public static final String KEY_CODE = "number";// 列名
+    public static final String KEY_ID = "_id";// id
+    public static final String KEY_PROVINCE = "province";// 省份
+    public static final String KEY_CITY = "city";// 城市
+    public static final String KEY_CODE = "number";// 城市代码
+    public static final String KEY_FIRSTPY="firstpy";   //标记为是否为已添加城市
 
     private int code;
     private String province;

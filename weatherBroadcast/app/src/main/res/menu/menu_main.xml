@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".DrawerLayout_OneActivity">
+
+    <item android:id="@+id/base_action_city"
+        android:title="base_action_bar_action_city"
+        android:orderInCategory="80"
+        android:icon="@drawable/base_action_bar_action_city"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_share"
+        android:title="title_share"
+        android:orderInCategory="90"
+        android:icon="@drawable/title_share"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_update"
+        android:title="action_update"
+        android:icon="@drawable/title_update"
+        android:orderInCategory="100"
+        app:showAsAction="ifRoom"/>
+</menu>

@@ -33,7 +33,6 @@ import java.util.Map;
 public class MyEventListener implements EventListener {
     private Context context;
     private Activity activity;
-
     private EventManager asr;
     private String citySpeaked="";
     private boolean enableOffline = false; // 测试离线命令词，需要改成true

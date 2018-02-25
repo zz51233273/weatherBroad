@@ -3,13 +3,12 @@ package com.example.hasee.weatherbroadcast.adapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.util.Log;
 import android.view.ViewGroup;
 
 import com.example.hasee.weatherbroadcast.fragment.MyFragment1;
 import com.example.hasee.weatherbroadcast.fragment.MyFragment2;
 import com.example.hasee.weatherbroadcast.fragment.MyFragment3;
-import com.example.hasee.weatherbroadcast.miniweather.FragmentPager;
+import com.example.hasee.weatherbroadcast.weather.FragmentPager;
 
 /**
  * Created by hasee on 2018/2/6.

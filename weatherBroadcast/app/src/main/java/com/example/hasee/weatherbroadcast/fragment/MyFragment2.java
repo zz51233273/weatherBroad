@@ -30,7 +30,6 @@ public class MyFragment2 extends Fragment{
         IndexAdapter indexAdapter=new IndexAdapter(getContext(),R.layout.index_item, indexItemList);
         ListView listView=(ListView)view.findViewById(R.id.mListView);
         listView.setAdapter(indexAdapter);
-        //initTomorrow(view);
         return view;
     }
 

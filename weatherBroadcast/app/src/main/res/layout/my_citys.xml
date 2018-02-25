@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/selectbg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/selectbg"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:alpha="0.38"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/tool"
+        android:layout_width="fill_parent"
+        android:layout_height="45.0dip"
+        android:background="#ffcd2626" >
+
+        <TextView
+            android:id="@+id/title_name"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="选择您的城市"
+            android:textColor="#ffffffff"
+            android:textSize="20.0dip" />
+
+        <ImageView
+            android:id="@+id/title_back"
+            android:layout_width="45.0dip"
+            android:layout_height="45.0dip"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/base_action_bar_back_normal" />
+        <ImageView
+            android:layout_width="1.0dip"
+            android:layout_height="40dip"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:layout_toRightOf="@id/title_back"
+            android:background="#A71717"
+            android:gravity="center" />
+
+    </RelativeLayout>
+
+    <!--实现布局的三等分-->
+    <LinearLayout
+        android:id="@+id/spi"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:layout_below="@id/tool">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_height="wrap_content">
+            <Spinner
+                android:id="@+id/select_provinces"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_height="wrap_content">
+            <Spinner
+                android:id="@+id/select_citys"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/addCity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="添加"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/speakRecognize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/spi"
+        android:layout_marginTop="80dp">
+        <TextView
+            android:id="@+id/speakname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="请说出城市名  如:(苏州)"
+            android:layout_marginTop="5dp"
+            android:textSize="17dp"/>
+        <Button
+            android:id="@+id/speak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_below="@id/speakname"
+            android:layout_marginTop="20dp"
+            android:text="长按"
+            android:textSize="15dp"/>
+
+    </RelativeLayout>
+
+    <TableLayout
+        android:id="@+id/mycitys"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/speakRecognize"
+        android:layout_marginTop="50dp">
+        <TextView
+            android:id="@+id/mycity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="您的城市(最多添加3个)"
+            android:textSize="24sp"/>
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/mycity1"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="无"
+                android:textSize="23sp" />
+
+            <ImageView
+                android:id="@+id/mycityimg1"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="60dp"
+                android:src="@drawable/delete_my_city" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp">
+            <TextView
+                android:id="@+id/mycity2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="23sp"/>
+            <ImageView
+                android:id="@+id/mycityimg2"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@drawable/delete_my_city"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="60dp"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp">
+            <TextView
+                android:id="@+id/mycity3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="23sp" />
+            <ImageView
+                android:id="@+id/mycityimg3"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@drawable/delete_my_city"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="60dp"/>
+        </TableRow>
+    </TableLayout>
+
+</RelativeLayout>
